@@ -69,37 +69,11 @@ def find_longest_3(S: str, D: set) -> str:
                 break
 
 
-from string import ascii_lowercase
-
-
-def find_longest_4(S: str, D: set) -> str:
-    indices = dict()
-    for idx, ch in enumerate(S):
-        if ch not in indices:
-            indices[ch] = [idx]
-        else:
-            indices[ch].append(idx)
-
-    chars = dict()
-    for ch in ascii_lowercase:
-        chars[ch] = []
-        length = len(indices[ch])
-        j = 0
-        for i in range(len(S)):
-            if j < length:
-                if indices[ch][j] <= i:
-                    chars[ch].append(indices[ch][j])
-                    j += 1
-                else:
-                    chars[ch].append(indices[ch][j + 1])
-                    j += 1
-                if j == length:
-                    break
-
-
-
 # Official Solution
 import collections
+
+
+# O(N + L)
 def find_longest_word_in_string(letters, words):
     letter_positions = collections.defaultdict(list)
     # For each letter in 'letters', collect all the indices at which it appears.
@@ -120,23 +94,26 @@ def find_longest_word_in_string(letters, words):
     # up to lengths of a few hundred characters.
     for word in sorted(words, key=lambda w: len(w), reverse=True):
         pos = 0
+        found = True
         for letter in word:
             if letter not in letter_positions:
+                found = False
                 break
-        # Find any remaining valid positions in search string where this
-        # letter appears.  It would be better to do this with binary search,
-        # but this is very Python-ic.
-        possible_positions = [p for p in letter_positions[letter] if p >= pos]
-        if not possible_positions:
-            break
-        pos = possible_positions[0] + 1
-        else:
-            # We didn't break out of the loop, so all letters have valid positions
+            # Find any remaining valid positions in search string where this
+            # letter appears.  It would be better to do this with binary search,
+            # but this is very Python-ic.
+            possible_positions = [p for p in letter_positions[letter] if p >= pos]
+            if not possible_positions:
+                found = False
+                break
+            pos = possible_positions[0] + 1
+
+        # We didn't break out of the loop, so all letters have valid positions
+        if found:
             return word
 
 
-
 string = "abppplee"
-words = {"able", "ale", "apple", "bale", "kangaroo"}
+words = {"able", "ale", "appyle", "bale", "kangaroo"}
 
 print(find_longest_word_in_string(string, words))
